@@ -1,7 +1,7 @@
 CommonQuery is a plugin that help you build the http request body which has these field:
 `where`/`orderBy`/`limit`/`pageNum`  
 
-[中文](https://https://github.com/linversion/CommonQuery/README-zh.md)
+[中文](https://github.com/linversion/CommonQuery/blob/main/README-zh.md)
 ## Features
 
 Usually we will build a map with these params and pass it to Dio which is boring and causing too much similar code. Use CommonQuery you only need to focus on your param's value.
