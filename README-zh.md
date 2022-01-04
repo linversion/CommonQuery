@@ -1,14 +1,13 @@
-CommonQuery is a plugin that help you build the http request body which has these field:
-`where`/`orderBy`/`limit`/`pageNum`  
+CommonQuery可以让你以链式调用的形式构建你的http请求体，当你的请求体有包含以下这些通用字段时:
+`where`/`orderBy`/`limit`/`pageNum`
 
-[中文](https://https://github.com/linversion/CommonQuery/README-zh.md)
 ## Features
 
-Usually we will build a map with these params and pass it to Dio which is boring and causing too much similar code. Use CommonQuery you only need to focus on your param's value.
+通常我们都得自己手动创建一个map，把参数放进去然后传给Dio，这样会造成很多样板代码，效率低下，使用CommonQuery的话你可以只关注于传值而不是构造这个map。
 
 ```dart
-// create a post request
-var response = dio.post('your path', 
+// 创建一个post请求
+var response = dio.post('your path',
     data: CommonQuery.instance
     .collect()
     .where('id', isEqualTo: '12345')
@@ -19,7 +18,7 @@ var response = dio.post('your path',
     .get()
 );
 
-//this is your data's json format
+//下面的json就是你的data最后的样子
 {
     "where": {
         "id": {
@@ -56,10 +55,10 @@ var response = dio.post('your path',
 }
 ```
 
-If you want to map the data to another stucture, just call the CommonQuery's setFormatter function once before you use CommonQuery.
+如果你需要的map格式不是这样的，那你可以在使用之前调用setFormatter这个方法，转换成你需要的格式。
 ```
 CommonQuery.instance.setFormatter((conditionMap) {
-    //just map the conditionMap to another map
+    //在这里做一个映射转换
 });
 
 //conditionMap
