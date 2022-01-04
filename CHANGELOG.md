@@ -1,3 +1,3 @@
 ## 0.0.1
-
-* TODO: Describe initial release.
+- support where/orderBy/limit/skip/fields/params
+- support set a custom formatter
