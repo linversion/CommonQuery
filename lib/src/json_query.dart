@@ -241,15 +241,20 @@ class JsonQueryDelegate {
         case 'where':
           final map = <String, dynamic>{};
           for (var element in value) {
-            map[element[0]] = {
-              'operation': [
-                {
-                  'value_type': getValueType(element[1], element[2]),
-                  'opt': element[1],
-                  'values': element[2] is List ? element[2] : [element[2].toString()]
-                }
-              ]
+            var condition = map[element[0]];
+            var operationItem = {
+              'value_type': getValueType(element[1], element[2]),
+              'opt': element[1],
+              'values': element[2] is List ? element[2] : [element[2].toString()]
             };
+            if (condition != null && condition['operation'] != null) {
+              //该条件已存在，加入到operation列表
+              (condition['operation'] as List).add(operationItem);
+            } else {
+              map[element[0]] = {
+                'operation': [operationItem]
+              };
+            }
           }
           entry = MapEntry(key, map);
           break;
