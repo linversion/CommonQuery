@@ -1,5 +1,5 @@
 CommonQuery可以让你以链式调用的形式构建你的http请求体，当你的请求体有包含以下这些通用字段时:
-`where`/`orderBy`/`limit`/`pageNum`
+`where`/`orderBy`/`limit`/`pageNum`/`skip`/`fields`/`params`
 
 ## Features
 

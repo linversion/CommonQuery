@@ -1,5 +1,5 @@
 CommonQuery is a plugin that help you build the http request body which has these field:
-`where`/`orderBy`/`limit`/`pageNum`  
+`where`/`orderBy`/`limit`/`pageNum`/`skip`/`fields`/`params`
 
 [中文](https://github.com/linversion/CommonQuery/blob/main/README-zh.md)
 ## Features
