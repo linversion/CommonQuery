@@ -1,12 +1,11 @@
 import 'package:common_query/src/equality.dart';
 import 'package:common_query/src/query.dart';
+import 'package:common_query/src/util.dart';
 
 class JsonQuery implements Query<Map<String, dynamic>> {
   final JsonQueryDelegate _delegate;
 
-  JsonQuery(
-    this._delegate,
-  );
+  JsonQuery(this._delegate);
 
   @override
   Query<Map<String, dynamic>> fields(List<String> fields) {
@@ -37,7 +36,8 @@ class JsonQuery implements Query<Map<String, dynamic>> {
     _assertValidFieldType(field);
     const ListEquality<dynamic> equality = ListEquality<dynamic>();
 
-    final List<List<dynamic>> conditions = List<List<dynamic>>.from(parameters['where']);
+    final List<List<dynamic>> conditions =
+        List<List<dynamic>>.from(parameters['where']);
 
     // Conditions can be chained from other [Query] instances
     void addCondition(dynamic field, String operator, dynamic value) {
@@ -47,7 +47,9 @@ class JsonQuery implements Query<Map<String, dynamic>> {
       }
       condition = <dynamic>[field, operator, value];
       assert(
-        conditions.where((List<dynamic> item) => equality.equals(condition, item)).isEmpty,
+        conditions
+            .where((List<dynamic> item) => equality.equals(condition, item))
+            .isEmpty,
         'Condition $condition already exists in this query.',
       );
 
@@ -77,7 +79,6 @@ class JsonQuery implements Query<Map<String, dynamic>> {
     }
 
     dynamic hasInequality;
-    bool hasIn = false;
     bool hasNotIn = false;
     bool hasNotEqualTo = false;
 
@@ -146,7 +147,8 @@ class JsonQuery implements Query<Map<String, dynamic>> {
   @override
   Query<Map<String, dynamic>> orderBy(String field, {bool descending = false}) {
     _assertValidFieldType(field);
-    final List<List<dynamic>> orders = List<List<dynamic>>.from(parameters['order_by']);
+    var origin = parameters['order_by'] ?? <List<dynamic>>[];
+    final List<List<dynamic>> orders = List<List<dynamic>>.from(origin);
     assert(
       orders.where((List<dynamic> item) => field == item[0]).isEmpty,
       'OrderBy field "$field" already exists in this query',
@@ -185,10 +187,9 @@ class JsonQuery implements Query<Map<String, dynamic>> {
   Map<String, dynamic> get() => _delegate.get();
 }
 
-Map<String, dynamic> _initialParameters = Map<String, dynamic>.unmodifiable({
-  'where': List<List<dynamic>>.unmodifiable([]),
-  'order_by': List<List<dynamic>>.unmodifiable([])
-});
+// initialize the parameter
+Map<String, dynamic> _initialParameters = Map<String, dynamic>.unmodifiable(
+    {'where': List<List<dynamic>>.unmodifiable([])});
 
 typedef Formatter = Map<String, dynamic> Function(Map<String, dynamic>);
 
@@ -198,8 +199,11 @@ class JsonQueryDelegate {
   Formatter? formatter;
 
   JsonQueryDelegate _copyWithParameters(Map<String, dynamic> parameters) {
-    return JsonQueryDelegate(Map<String, dynamic>.unmodifiable(
-        Map<String, dynamic>.from(this.parameters)..addAll(parameters)));
+    return JsonQueryDelegate(
+      Map<String, dynamic>.unmodifiable(
+          Map<String, dynamic>.from(this.parameters)..addAll(parameters)),
+      formatter: formatter,
+    );
   }
 
   JsonQueryDelegate(Map<String, dynamic>? params, {this.formatter})
@@ -243,9 +247,10 @@ class JsonQueryDelegate {
           for (var element in value) {
             var condition = map[element[0]];
             var operationItem = {
-              'value_type': getValueType(element[1], element[2]),
+              'value_type': Util.getValueType(element[1], element[2]),
               'opt': element[1],
-              'values': element[2] is List ? element[2] : [element[2].toString()]
+              'values':
+                  element[2] is List ? element[2] : [element[2].toString()]
             };
             if (condition != null && condition['operation'] != null) {
               //该条件已存在，加入到operation列表
@@ -261,7 +266,10 @@ class JsonQueryDelegate {
         case 'order_by':
           final list = <Map<String, String>>[];
           for (var element in value) {
-            list.add({'field': element[0], 'sort': element[1] == true ? 'desc' : 'asc'});
+            list.add({
+              'field': element[0],
+              'sort': element[1] == true ? 'desc' : 'asc'
+            });
           }
           value = list;
           entry = MapEntry(key, list);
@@ -269,14 +277,5 @@ class JsonQueryDelegate {
       }
       return entry ?? MapEntry(key, value);
     });
-  }
-
-  String getValueType(String opt, dynamic values) {
-    if (opt == optIn || opt == optNin) {
-      var item = (values as List).first;
-      return item.runtimeType.toString().toLowerCase();
-    } else {
-      return values.runtimeType.toString().toLowerCase();
-    }
   }
 }
